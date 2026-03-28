@@ -8,5 +8,3 @@ google-generativeai
 requests
 python-dotenv
 xgboost
-# Jika nanti Anda menggunakan API OpenAI, hilangkan tanda pagar di bawah:
-# openai
