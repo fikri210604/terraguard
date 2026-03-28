@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from datetime import datetime, timedelta
 import numpy as np
+import os
 
 def get_lampung_kabupaten():
     """
@@ -80,6 +81,7 @@ def prepare_prediction_features(weather_df):
         return pd.DataFrame()
 
     # 1. Agregasi Bulanan
+    weather_df = weather_df.copy()
     weather_df['year'] = weather_df['date'].dt.year
     weather_df['month'] = weather_df['date'].dt.month
     
@@ -118,6 +120,10 @@ def get_disaster_stats(kab_name):
     """
     csv_path = "data/raw/data_bencana.csv"
     
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} not found.")
+        return None, None, 0, None
+
     try:
         df = pd.read_csv(csv_path, low_memory=False)
         
