@@ -109,3 +109,61 @@ def prepare_prediction_features(weather_df):
     monthly['month_cos'] = np.cos(2 * np.pi * monthly['month'] / 12)
     
     return monthly
+
+def get_disaster_stats(kab_name):
+    """
+    Memuat data historis bencana BNPB dan memfilter berdasarkan nama kabupaten.
+    kab_name bisa berisi format "Kec. X, Kabupaten Y" - akan diekstrak otomatis.
+    Mengembalikan (df_by_type, df_by_year, total_events, last_year).
+    """
+    csv_path = "data/raw/data_bencana.csv"
+    
+    try:
+        df = pd.read_csv(csv_path, low_memory=False)
+        
+        # Filter Lampung
+        df = df[df['Provinsi'] == 'Lampung'].copy()
+        df['kabupaten_clean'] = df['Kabupaten'].str.replace('Kota ', '', regex=False).str.strip()
+        
+        # Ekstrak nama kabupaten dari string "Kec. X, Kabupaten Lampung Selatan"
+        # Ambil bagian setelah koma terakhir: "Lampung Selatan"
+        kab_search = kab_name
+        if ',' in kab_name:
+            kab_search = kab_name.split(',')[-1].strip()
+        
+        # Fuzzy match: cari kabupaten yang mengandung kata kunci
+        kab_words = [w for w in kab_search.split() if len(w) > 3]
+        
+        matched = pd.DataFrame()
+        for word in kab_words:
+            mask = df['kabupaten_clean'].str.contains(word, case=False, na=False)
+            if mask.sum() > 0:
+                matched = df[mask].copy()
+                break
+        
+        if matched.empty:
+            return None, None, 0, None
+        
+        # Filter tipe bencana relevan
+        target_types = ['Banjir', 'Tanah Longsor', 'Longsor', 'Cuaca ekstrem', 'Puting Beliung']
+        matched = matched[matched['Jenis Bencana'].isin(target_types)].copy()
+        
+        if matched.empty:
+            return None, None, 0, None
+        
+        # Agregasi per Jenis Bencana
+        df_by_type = matched.groupby('Jenis Bencana').size().reset_index(name='jumlah')
+        df_by_type = df_by_type.sort_values('jumlah', ascending=False)
+        
+        # Agregasi per Tahun
+        df_by_year = matched.groupby('Tahun').size().reset_index(name='jumlah')
+        df_by_year = df_by_year.sort_values('Tahun')
+        
+        total_events = len(matched)
+        last_year = int(matched['Tahun'].max()) if not matched.empty else None
+        
+        return df_by_type, df_by_year, total_events, last_year
+        
+    except Exception as e:
+        print(f"Disaster data error: {e}")
+        return None, None, 0, None

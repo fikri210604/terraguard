@@ -53,7 +53,7 @@ def get_gemini_recommendation(risk_score, lokasi_nama, weather_summary, elevatio
 
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         # Tambahan konteks jika kawasan khusus
         geo_context = ""

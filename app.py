@@ -3,12 +3,13 @@ import folium
 from streamlit_folium import st_folium
 
 # Import Utilities
-from utils.data_loader import fetch_recent_weather, prepare_prediction_features
+from utils.data_loader import fetch_recent_weather, prepare_prediction_features, get_disaster_stats
 from utils.ai_generator import predict_disaster_probability, generate_ai_recommendation
 from utils.geo_utils import detect_geo_type
-from utils.ui_components import (
-    render_custom_css, render_hero, render_footer, 
-    render_glass_card, render_decision_box, render_blocked_box
+from templates.ui_components import (
+    render_custom_css, render_meta, render_hero, render_footer, 
+    render_glass_card, render_decision_box, render_blocked_box,
+    render_disaster_history, render_weather_insights
 )
 
 # --- 1. CONFIGURATION ---
@@ -21,6 +22,7 @@ st.set_page_config(
 
 # Render Styles & Header
 render_custom_css()
+render_meta()
 render_hero()
 
 # --- 2. STATE MANAGEMENT ---
@@ -114,10 +116,24 @@ if st.session_state.should_analyze:
                         st.markdown(ai_report)
                     
                     with tab_data:
+                        # 1. Weather Trends & Features
                         st.markdown("#### 📈 Tren Curah Hujan Harian")
                         st.line_chart(weather_data.set_index('date')['rain_sum'], color="#0ea5e9")
-                        st.markdown("#### 🧮 Fitur Model (Bulan Terakhir)")
-                        st.dataframe(features_df.tail(1).T, use_container_width=True)
+                        st.caption("Curah hujan harian yang digunakan sebagai input model ML.")
+                        
+                        st.markdown("---")
+                        render_weather_insights(features_df)
+                        
+                        st.markdown("---")
+                        # 2. BNPB Historical Records
+                         # Muat dan tampilkan sejarah bencana BNPB
+                        with st.spinner("Memuat catatan sejarah bencana..."):
+                            df_by_type, df_by_year, total_events, last_year = get_disaster_stats(lokasi)
+                        render_disaster_history(df_by_type, df_by_year, total_events, last_year, lokasi)
+                        
+                        # 3. Raw Model Features
+                        with st.expander("🔎 Lihat Fitur Model Terproses (Raw Dataframe)"):
+                             st.dataframe(features_df.tail(3).T, use_container_width=True)
 
 # Footer
 st.markdown("---")
