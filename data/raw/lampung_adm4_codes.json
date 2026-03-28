@@ -1,0 +1,92 @@
+{
+  "Lampung Selatan": {
+    "adm4": "18.01.04.2001",
+    "desa": "Hajimena",
+    "kecamatan": "Natar",
+    "kabupaten": "Lampung Selatan"
+  },
+  "Lampung Tengah": {
+    "adm4": "18.02.01.2001",
+    "desa": "Sri Way Langsep",
+    "kecamatan": "Kalirejo",
+    "kabupaten": "Lampung Tengah"
+  },
+  "Lampung Utara": {
+    "adm4": "18.03.01.1001",
+    "desa": "Bukit Kemuning",
+    "kecamatan": "Bukit Kemuning",
+    "kabupaten": "Lampung Utara"
+  },
+  "Lampung Barat": {
+    "adm4": "18.04.04.1001",
+    "desa": "Pasar Liwa",
+    "kecamatan": "Balik Bukit",
+    "kabupaten": "Lampung Barat"
+  },
+  "Tulang Bawang": {
+    "adm4": "18.05.02.2001",
+    "desa": "Bujung Tenuk",
+    "kecamatan": "Menggala",
+    "kabupaten": "Tulang Bawang"
+  },
+  "Tanggamus": {
+    "adm4": "18.06.01.1001",
+    "desa": "Baros",
+    "kecamatan": "Kota Agung",
+    "kabupaten": "Tanggamus"
+  },
+  "Lampung Timur": {
+    "adm4": "18.07.01.2001",
+    "desa": "Sukadana",
+    "kecamatan": "Sukadana",
+    "kabupaten": "Lampung Timur"
+  },
+  "Way Kanan": {
+    "adm4": "18.08.02.2001",
+    "desa": "Datar Bancong",
+    "kecamatan": "Kasui",
+    "kabupaten": "Way Kanan"
+  },
+  "Pesawaran": {
+    "adm4": "18.09.01.2001",
+    "desa": "Padang Ratu",
+    "kecamatan": "Gedong Tataan",
+    "kabupaten": "Pesawaran"
+  },
+  "Pringsewu": {
+    "adm4": "18.10.01.1001",
+    "desa": "Fajaresuk",
+    "kecamatan": "Pringsewu",
+    "kabupaten": "Pringsewu"
+  },
+  "Mesuji": {
+    "adm4": "18.11.01.2001",
+    "desa": "Wiralaga I",
+    "kecamatan": "Mesuji",
+    "kabupaten": "Mesuji"
+  },
+  "Tulang Bawang Barat": {
+    "adm4": "18.12.01.1001",
+    "desa": "Mulyo Asri",
+    "kecamatan": "Tulang Bawang Tengah",
+    "kabupaten": "Tulang Bawang Barat"
+  },
+  "Pesisir Barat": {
+    "adm4": "18.13.01.2001",
+    "desa": "Way Redak",
+    "kecamatan": "Pesisir Tengah",
+    "kabupaten": "Pesisir Barat"
+  },
+  "Bandar Lampung": {
+    "adm4": "18.71.01.1003",
+    "desa": "Kedaton",
+    "kecamatan": "Kedaton",
+    "kabupaten": "Kota Bandar Lampung"
+  },
+  "Metro": {
+    "adm4": "18.72.01.1001",
+    "desa": "Metro",
+    "kecamatan": "Metro Pusat",
+    "kabupaten": "Kota Metro"
+  }
+}

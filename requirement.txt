@@ -1,0 +1,12 @@
+streamlit
+pandas
+folium
+streamlit-folium
+scikit-learn
+geopy
+google-generativeai
+requests
+python-dotenv
+xgboost
+# Jika nanti Anda menggunakan API OpenAI, hilangkan tanda pagar di bawah:
+# openai
