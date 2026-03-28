@@ -106,7 +106,7 @@ if st.session_state.should_analyze:
                     col_met3.metric("Ketinggian Lahan", f"{metadata.get('elevation', 0)} mdpl")
 
                     # Deep Insights
-                    tab_ai, tab_data = st.tabs(["🤖 Konsultan Arsitek AI (Gemini)", "📊 Analisis Detail"])
+                    tab_ai, tab_data = st.tabs(["🤖 Konsultan AI (Google Gemini 2.5 Flash)", "📊 Analisis Detail & Sejarah"])
                     
                     with tab_ai:
                         with st.spinner("AI sedang merumuskan desain konstruksi..."):

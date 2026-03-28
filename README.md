@@ -1,122 +1,65 @@
 # 🌍 TerraGuard AI (Lampung Edition)
-### Asisten Cerdas Prediksi Risiko Bencana Lahan & Properti
+### Hybrid AI: Predictive Disaster Model + Generative Expert Advisor (2.5 Flash)
 
 ---
 
-## 📌 Latar Belakang & Fokus Wilayah
-Indonesia adalah negara rawan bencana. **TerraGuard AI** hadir sebagai *predictive system* dan **alat bantu keputusan investasi properti** bagi calon pembeli lahan/rumah di Provinsi Lampung. Aplikasi ini membantu pengguna memperkirakan probabilitas bencana dalam 30 hari ke depan di titik lokasi spesifik (berbasis koordinat GPS).
+## 📌 Latar Belakang
+**TerraGuard AI** adalah platform *Property Advisor* masa depan yang menggabungkan kekuatan **Big Data Meteorologi** dengan **Kecerdasan Buatan (AI)**. Proyek ini memecahkan kebuntuan informasi bagi calon pembeli lahan di Lampung yang sering kali tidak tahu risiko bencana tersembunyi di balik sebuah lokasi GPS.
 
-## 🤖 Integrasi AI (Predictive + Generative)
-1.  **Predictive Model (Time-Series Logistic Regression)**: 
-    Memprediksi probabilitas (0-100%) terjadinya bencana (banjir/longsor) di suatu wilayah dalam **30 hari ke depan**. Model dilatih menggunakan *temporal splitting* dan *lag/rolling features* dari 16 tahun sejarah cuaca Open-Meteo dan insiden BNPB (DIBI) — memastikan validitas saintifik.
-2.  **Expert Recommendation (Google Gemini 1.5 Flash)**: 
-    Bertindak sebagai konsultan tata ruang. Gemini akan menerima probabilitas bencana dari ML dan langsung memberikan **keputusan tegas untuk pembeli lahan** (Membeli vs Jangan Membeli) lengkap dengan syarat mitigasi konstruksinya.
+## 🤖 Keunggulan Utama: Integrasi Gemini AI
+Proyek ini menonjolkan penggunaan **Google Gemini 2.5 Flash** bukan sekadar sebagai chatbot, melainkan sebagai **Expert Decision Maker**:
 
-## ✨ Fitur Utama
-*   **📍 Interactive Pin-Drop Map**: Pengguna dapat mencari dan menandai (klik) titik lahan yang ingin mereka beli langsung di peta.
-*   **📡 Dynamic Weather Routing**: Sistem otomatis menarik data cuaca 90 hari terakhir (Via Open-Meteo Forecast API) spesifik pada titik koordinat (Lat/Lon) yang dipilih pengguna.
-*   **🏢 Property Investment Advisor**: Rekomendasi "Go/No-Go" berbasis AI untuk kelayakan lahan secara meteorologis dan geologis.
+*   **Reasoning-Based Advice**: Gemini menerima input data "kering" dari Machine Learning (probabilitas %), data topografi (elevasi), dan jenis geografi (hutan/dekat sungai) untuk dirangkum menjadi keputusan investasi yang manusiawi dan logis.
+*   **Engineering Insights**: Gemini memberikan saran teknis konstruksi (misal: penggunaan pondasi cakar ayam, peninggian lantai utama, atau sistem drainase khusus) yang disesuaikan dengan profil risiko lokasi tersebut.
+*   **Legal & Safety Safeguard**: AI memberikan peringatan hukum jika lokasi berada di jalur hijau atau kawasan lindung, yang sering kali terlewatkan oleh pembeli awam.
 
 ---
 
-## 📊 Sumber Data
-
-| Sumber | Deskripsi | File |
-|---|---|---|
-| **BNPB DIBI** | Insiden bencana historis (2010–2026) | `data/raw/data_bencana.csv` |
-| **Open-Meteo** | Data cuaca harian historis (2010–2026) Lampung | `data/raw/historical_weather_lampung.csv` |
-| **Open-Meteo Forecast** | Real-time weather API (90 hari lalu & 1 ke depan) | Terhubung di `utils/data_loader.py` |
+## ✨ Fitur Inovatif
+*   **📍 Precision Pin-Drop**: Navigasi peta interaktif untuk pemilihan titik lahan secara akurat.
+*   **⛰️ Topographic Intelligence**: Analisis otomatis risiko longsor berdasarkan ketinggian lahan (mdpl).
+*   **📊 BNPB Historical Deep-Dive**: Menyajikan data sejarah bencana nyata 15 tahun terakhir di lokasi terpilih.
+*   **⚡ Real-Time Weather Routing**: Mengambil data meteorologi 90 hari terakhir secara dinamis via API.
+*   **🤖 Gemini Expert Tab**: Dedicated space untuk konsultasi hasil analisis dalam format laporan profesional.
 
 ---
 
-## 🧠 Pipeline Training Klasifikasi (Validasi ketat Time-Series)
+## 🛠️ Teknologi Stack
+*   **AI/ML Core**: Logistic Regression (Predictive) + **Google Gemini 2.5 Flash (Generative)**.
+*   **Framework**: Streamlit (Backend & UI).
+*   **Geospatial**: Folium, Leaflet, & Nominatim API.
+*   **Data Source**: Open-Meteo & BNPB Indonesia.
 
-### Alur Notebook: `notebooks/model_bnpb.ipynb`
+---
 
-```
-┌──────────────────┐     ┌───────────────────────┐
-│   Data Bencana   │     │ Cuaca (Open-Meteo)    │
-│   (BNPB)         │     │                       │
-└────────┬─────────┘     └───────────┬───────────┘
-         │                           │
-         ▼                           ▼
-┌──────────────────┐     ┌───────────────────────┐
-│ Agregasi Bulanan │     │ Agregasi Bulanan      │
-│ per Kabupaten    │     │ per Kabupaten         │
-│ (n_bencana)      │     │ (avg_rain, max_rain,  │
-│                  │     │ rainy_days, dll)      │
-└────────┬─────────┘     └───────────┬───────────┘
-         │                           │
-         └─────────────┬─────────────┘
-                       ▼
-            ┌─────────────────────┐
-            │  MERGE BULANAN      │
-            └──────────┬──────────┘
-                       ▼
-            ┌─────────────────────┐
-            │ TARGET SHIFT (y)    │
-            │ = n_bencana > 0     │
-            │ di BULAN DEPAN      │
-            └──────────┬──────────┘
-                       ▼
-            ┌─────────────────────┐
-            │ TIME-SERIES FEATURE │
-            │ ENGINEERING         │
-            │ • Lag 1             │
-            │ • Rolling 3 Mean/Std│
-            │ • Seasonal Sin/Cos  │
-            └──────────┬──────────┘
-                       ▼
-            ┌──────────────────────┐
-            │ TIME-BASED SPLIT     │
-            │ Train: 2010-2023     │
-            │ Test : 2024-2026     │
-            └──────────┬───────────┘
-                       ▼
-            ┌──────────────────────┐
-            │ Logistic Regression  │
-            │ (Scale + Predict)    │
-            │ Metrik: ROC-AUC > 0.6│
-            └──────────────────────┘
+## 📂 Struktur Proyek Modular
+```text
+├── app.py                # Main Orchestrator
+├── templates/
+│   ├── ui_components.py  # Visual Branding & UI Rendering
+│   └── index.html        # HTML Meta & Layout Fragments
+├── utils/
+│   ├── ai_generator.py   # Core Logic: ML Inference & Gemini Expert
+│   ├── data_loader.py    # Data Pipeline (Weather & BNPB)
+│   └── geo_utils.py      # Geographic Intelligence
+├── static/
+│   └── style.css         # Premium Glassmorphism Design
+└── scripts/
+    └── test_gemini.py    # Gemini Connectivity Diagnostic Tool
 ```
 
 ---
 
-## 📚 Teknologi
-*   **Frontend**: Streamlit, Folium (Interactive Maps)
-*   **ML**: Scikit-Learn (Logistic Regression, StandardScaler)
-*   **Data Prep**: Pandas, NumPy (Shift, Rolling Window)
-*   **API Data**: Open-Meteo API
-*   **LLM**: Google Gemini 1.5 Flash API
+## 🛠️ Cara Menjalankan
+1.  Install dependencies: `pip install -r requirements.txt`
+2.  Setup `.env`: `GOOGLE_API_KEY=AIza...`
+3.  Run: `streamlit run app.py`
 
 ---
 
-## 🛠️ Panduan Menjalankan Secara Lokal
+## 📬 Kontak
+**Email**: afh.fikri2106@gmail.com
+**IDCamp 2026 Project Submission**
 
-1. **Clone repository ini:**
-   ```bash
-   git clone https://github.com/USERNAME/terraguard-ai.git
-   cd terraguard-ai
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirement.txt
-   ```
-
-3. **Setup API Key:**
-   ```bash
-   # Buat file .env
-   GOOGLE_API_KEY=AIza...
-   ```
-
-4. **Training model prediktif (Opsional, Model siap di models/):**
-   ```bash
-   jupyter notebook notebooks/model_bnpb.ipynb
-   ```
-
-5. **Jalankan aplikasi:**
-   ```bash
-   streamlit run app.py
-   ```
-# terraguard
+---
+*Powered by Google Gemini 2.5 AI & Scikit-Learn*
