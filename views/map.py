@@ -3,6 +3,28 @@ import folium
 from streamlit_folium import st_folium
 from utils.geo_utils import detect_geo_type
 from templates.ui_map import render_floating_ui
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
+
+# Geocoder setup
+geolocator = Nominatim(user_agent="terraguard_ai")
+
+# Floating Search Bar Logic (Code in sidebar to prevent layout push, CSS moves it to map)
+with st.sidebar:
+    search_query = st.text_input("Search Location", placeholder="Search region...", label_visibility="collapsed", key="map_search_sidebar")
+
+if search_query:
+    try:
+        location = geolocator.geocode(search_query)
+        if location:
+            if location.latitude != st.session_state.target_lat or location.longitude != st.session_state.target_lon:
+                st.session_state.target_lat = location.latitude
+                st.session_state.target_lon = location.longitude
+                st.rerun()
+        else:
+            st.toast(f"Lokasi '{search_query}' tidak ditemukan.", icon="⚠️")
+    except Exception as e:
+        st.toast(f"Gagal mencari lokasi: {str(e)}", icon="❌")
 
 # Activate Fullscreen CSS targeting for this page only
 st.markdown('<div class="map-fullscreen-flag"></div>', unsafe_allow_html=True)
@@ -19,7 +41,11 @@ lokasi, geo_type, geo_warning = detect_geo_type(st.session_state.target_lat, st.
 render_floating_ui(st.session_state.target_lat, st.session_state.target_lon, lokasi, geo_type, geo_warning)
 
 # Render Full Width Interactive Map
-m = folium.Map(location=[-4.9818, 105.0766], zoom_start=8, tiles="CartoDB positron")
+m = folium.Map(
+    location=[st.session_state.target_lat, st.session_state.target_lon], 
+    zoom_start=13, 
+    tiles="CartoDB positron"
+)
 
 # Layer Sesar Semangko
 sesar_coords = [

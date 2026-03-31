@@ -59,12 +59,6 @@ def render_floating_ui(lat, lon, lokasi, geo_type, geo_warning):
             </div>
         </div>
     </div>
-    <div style="position: absolute; top: 2rem; right: 2.5rem; z-index: 999; pointer-events: auto;">
-        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 10px; width: 280px; background: rgba(25, 31, 49, 0.85); border: 1px solid rgba(65, 72, 75, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(12px);">
-            <span class="material-symbols-outlined" style="color: var(--on-surface-variant); font-size: 18px;">search</span>
-            <input type="text" placeholder="Search region..." style="background: transparent; border: none; color: var(--on-surface); font-family: 'Inter', sans-serif; font-size: 0.85rem; width: 100%; outline: none;" disabled>
-            <div style="background: rgba(255,255,255,0.08); border-radius: 4px; padding: 2px 6px; font-size: 9px; color: var(--on-surface-variant); font-family: monospace;">⌘K</div>
-        </div>
     </div>
     """)
     

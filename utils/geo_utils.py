@@ -45,25 +45,43 @@ def detect_geo_type(lat, lon):
                 lokasi_nama = res_geo.get("display_name", "Badan Air")
                 return lokasi_nama, geo_type, geo_warning
                 
-            # --- DETEKSI INFRASTRUKTUR PUBLIK (JALAN & REL) ---
-            if osm_class == "highway":
-                geo_type = "Infrastruktur (Jalan Raya)"
-                geo_warning = "[TERLARANG] 🛣️ Lahan ini berada tepat di atas atau memotong Jalur Jalan Raya / Tol. Lahan tidak bisa disertifikasi / dibangun rumah pribadi."
-                lokasi_nama = res_geo.get("display_name", "Jalan Utama")
-                return lokasi_nama, geo_type, geo_warning
-                
-            if osm_class == "railway":
-                geo_type = "Infrastruktur (Rel Kereta)"
-                geo_warning = "[TERLARANG] 🚂 Lahan ini persis berada di atas Jalur Rel Kereta Api (Aset PT KAI). Membangun rumah di sini melanggar undang-undang perkeretaapian."
-                lokasi_nama = res_geo.get("display_name", "Rel Kereta Api")
-                return lokasi_nama, geo_type, geo_warning
-            
-            # --- DETEKSI KAWASAN LINDUNG ---
+            # --- DETEKSI KAWASAN LINDUNG & KONSERVASI (Prioritas Tinggi) ---
             protected_keywords = ["taman nasional", "national park", "cagar alam", "nature reserve", 
                                   "hutan lindung", "protected forest", "suaka margasatwa", "wildlife"]
             if any(kw in display_name.lower() for kw in protected_keywords):
                 geo_type = "Kawasan Konservasi / Taman Nasional"
                 geo_warning = "🌲 Lokasi ini berada di dalam / dekat Kawasan Konservasi. Mendirikan bangunan masif kemungkinan melanggar hukum kehutanan."
+                return res_geo.get("display_name", "Kawasan Lindung"), geo_type, geo_warning
+
+            # --- DETEKSI BANGUNAN / PEMUKIMAN (Prioritas Menengah) ---
+            # Jika ada nomor rumah, nama bangunan, atau label pemukiman, utamakan ini daripada jalan terdekat
+            has_building_info = any(k in address for k in ["house_number", "building", "residential", "office", "shop", "amenity"])
+            
+            if osm_class == "landuse" and osm_type == "residential" or has_building_info:
+                geo_type = "Kawasan Pemukiman (Residential)"
+                geo_warning = "🏡 Lahan ini berada di dalam batas pemukiman / area peruntukan bangunan. Sangat cocok untuk pengembangan properti."
+                
+                # Ekstrak Nama Alamat yang Lebih Rapi
+                addr = res_geo.get('address', {})
+                street = addr.get('road', '')
+                suburb = addr.get('village', addr.get('suburb', ''))
+                lokasi_nama = f"{street}, {suburb}".strip(", ") if street else suburb
+                return lokasi_nama, geo_type, geo_warning
+
+            # --- DETEKSI INFRASTRUKTUR PUBLIK (JALAN & REL) ---
+            if osm_class == "highway":
+                # Validasi: Apakah ini benar-benar jalan utama atau hanya klik di pemukiman yang dekat jalan?
+                # Jika rank 30 dan tidak ada info bangunan, baru anggap jalan utama.
+                geo_type = "Infrastruktur (Jalan Raya)"
+                geo_warning = "[TERLARANG] 🛣️ Lahan ini berada tepat di atas atau memotong Jalur Jalan Raya / Tol. Lahan tidak bisa disertifikasi / dibangun rumah pribadi."
+                lokasi_nama = res_geo.get("display_name", "Jalan Utama").split(',')[0]
+                return lokasi_nama, geo_type, geo_warning
+                
+            if osm_class == "railway":
+                geo_type = "Infrastruktur (Rel Kereta)"
+                geo_warning = "[TERLARANG] 🚂 Lahan ini persis berada di atas Jalur Rel Kereta Api (Aset PT KAI). Membangun rumah di sini melanggar undang-undang perkeretaapian."
+                lokasi_nama = "Area Rel Kereta Api"
+                return lokasi_nama, geo_type, geo_warning
             
             # --- DETEKSI HUTAN ---
             elif osm_type in ["forest", "wood"] or (osm_class == "landuse" and "hutan" in display_name.lower()):

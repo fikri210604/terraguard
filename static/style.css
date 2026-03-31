@@ -25,14 +25,52 @@
     color: var(--on-surface);
 }
 
+/* === NATIVE APP HEADER & OVERRIDES === */
 header[data-testid="stHeader"] {
-    background: transparent !important;
-    z-index: 100 !important; /* Above my custom nav so toggle is clickable */
+    background: transparent !important; /* Biar navbar kita yang di bawahnya terlihat */
+    z-index: 1000000 !important; /* Angka super tinggi agar tombol chevron selalu bisa diklik */
+    height: 60px !important;
+}
+
+/* Memposisikan ulang isi header asli agar pas dengan navbar kita */
+header[data-testid="stHeader"] > div {
+    height: 60px !important;
+    display: flex;
+    align-items: center;
+}
+
+[data-testid="stSidebar"] {
+    background-color: rgba(18, 22, 33, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-right: 1px solid rgba(0, 218, 243, 0.15) !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5) !important;
+    z-index: 999991 !important;
 }
 
 .main .block-container {
-    padding-top: 1rem;
+    padding-top: 5rem !important;
     max-width: 1400px;
+}
+
+/* Gaya Khusus Tombol Chevron Asli Streamlit */
+button[data-testid="stSidebarCollapseButton"],
+button[data-testid="stExpandSidebarButton"] {
+    background: rgba(0, 218, 243, 0.15) !important;
+    border: 1px solid rgba(0, 218, 243, 0.4) !important;
+    border-radius: 8px !important;
+    color: #00daf3 !important;
+    width: 38px !important;
+    height: 38px !important;
+    margin-left: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+button[data-testid="stSidebarCollapseButton"]:hover,
+button[data-testid="stExpandSidebarButton"]:hover {
+    background: rgba(0, 218, 243, 0.3) !important;
+    border-color: #00daf3 !important;
+    transform: scale(1.05);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -45,144 +83,50 @@ h1, h2, h3, h4, h5, h6 {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* === TOP NAVIGATION BAR (Replaces Hero) === */
-.top-nav-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 72px;
-    background: rgba(18, 22, 33, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 218, 243, 0.15);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1.5rem;
-    z-index: 999999 !important; /* Higher than Streamlit's sidebar (999991) */
-}
-.nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-}
-
-.nav-toggle-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--on-surface-variant);
-    padding: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.nav-toggle-btn:hover {
-    background: rgba(0, 218, 243, 0.15);
-    color: var(--primary);
-    border-color: var(--primary);
-}
-
-.brand-text {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 1.4rem;
-    color: var(--primary);
-    letter-spacing: -0.5px;
-    text-shadow: 0 0 20px rgba(0, 218, 243, 0.3);
-}
-.nav-status {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.status-pill {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--surface-container-low);
-    padding: 6px 12px;
-    border-radius: 9999px;
-    border: 1px solid rgba(65, 72, 75, 0.15);
-}
-.ping-dot {
-    position: relative;
-    display: flex;
-    height: 8px;
-    width: 8px;
-}
-.ping-animate {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    border-radius: 50%;
-    background-color: var(--secondary);
-    opacity: 0.75;
-    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-.ping-core {
-    position: relative;
-    border-radius: 50%;
-    height: 8px;
-    width: 8px;
-    background-color: var(--secondary);
-}
-@keyframes ping {
-    75%, 100% {
-        transform: scale(2);
-        opacity: 0;
-    }
-}
-.status-text {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--secondary);
-}
-.profile-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-.nav-icon {
-    color: var(--on-surface-variant);
-    cursor: pointer;
-    font-size: 20px;
-    transition: color 0.3s;
-}
-.nav-icon:hover {
-    color: var(--primary);
-}
-.profile-pic {
-    height: 32px;
-    width: 32px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 1px solid rgba(65, 72, 75, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.top-nav-spacer {
-    height: 72px; /* standard space below header */
-}
-
 /* === GLASS PANEL === */
 .glass-panel {
-    background: rgba(25, 31, 49, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(65, 72, 75, 0.15);
-    border-radius: 12px;
+    background: rgba(25, 31, 49, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 218, 243, 0.2);
+    border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 15px 45px rgba(0,0,0,0.4);
 }
 
+/* === ULTIMATE FULLSCREEN MAP MODE (Sapu Bersih) === */
+.stApp:has(.map-fullscreen-flag) footer[data-testid="stFooter"],
+.stApp:has(.map-fullscreen-flag) .footer-bar-new,
+.stApp:has(.map-fullscreen-flag) .global-floating-stats {
+    display: none !important;
+}
+
+.stApp:has(.map-fullscreen-flag) .stMainBlockContainer {
+    max-width: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.stApp:has(.map-fullscreen-flag) .stMain {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important; 
+}
+
+.stApp:has(.map-fullscreen-flag) iframe[title="st_folium.folium_static"] {
+    width: 100vw !important;
+    height: 100vh !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Floating UI Overlay Fix for Fullscreen */
+.stApp:has(.map-fullscreen-flag) .glass-panel, 
+.stApp:has(.map-fullscreen-flag) div[data-testid="stButton"] {
+    z-index: 1001 !important;
+}
 .target-analysis-header {
     display: flex;
     justify-content: space-between;
@@ -496,8 +440,6 @@ div[data-testid="stVerticalBlock"] > div:last-child {
 }
 
 /* === ULTIMATE FULLSCREEN MAP MODE (Sapu Bersih) === */
-/* Target the top-level app container specifically for the map page */
-.stApp:has(.map-fullscreen-flag) header[data-testid="stHeader"],
 .stApp:has(.map-fullscreen-flag) footer[data-testid="stFooter"],
 .stApp:has(.map-fullscreen-flag) .footer-bar-new,
 .stApp:has(.map-fullscreen-flag) .global-floating-stats {
@@ -516,15 +458,15 @@ div[data-testid="stVerticalBlock"] > div:last-child {
 .stApp:has(.map-fullscreen-flag) .stMain {
     padding: 0 !important;
     margin: 0 !important;
-    overflow: hidden !important; /* Removes the 10px scrollbar reserved space */
+    overflow: hidden !important; 
 }
 
 /* Ensure the Folium iframe fills the entire viewport without exception */
 .stApp:has(.map-fullscreen-flag) iframe[title="st_folium.folium_static"] {
     width: 100vw !important;
-    height: calc(100vh - 72px) !important;
+    height: calc(100vh - 60px) !important;
     border: none !important;
-    margin-top: 72px !important; 
+    margin-top: 60px !important; 
     padding: 0 !important;
 }
 
@@ -548,4 +490,92 @@ div[data-testid="stVerticalBlock"] > div:last-child {
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 12px !important;
     padding: 16px 30px !important;
+}
+
+/* === FLOATING MAP SEARCH BAR (Sidebar Portal - Ultra Robust) === */
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) {
+    position: fixed !important;
+    top: 80px !important;
+    right: 2.5rem !important;
+    z-index: 1100000 !important; /* Higher than Streamlit Header (1M) */
+    width: 280px !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* Ensure parents don't hide the portal */
+div[data-testid="stSidebar"], 
+div[data-testid="stSidebar"] > div {
+    overflow: visible !important;
+}
+
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) label {
+    display: none !important;
+}
+
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) > div {
+    background: rgba(18, 22, 33, 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(0, 218, 243, 0.5) !important;
+    border-radius: 12px !important;
+    padding: 0 !important;
+    box-shadow: 0 0 20px rgba(0, 218, 243, 0.2), 0 10px 40px rgba(0,0,0,0.7) !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    position: relative !important;
+}
+
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) > div:focus-within {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 30px rgba(0, 218, 243, 0.5) !important;
+}
+
+/* Icon Search - Cyberpunk Style */
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) > div::before {
+    content: "search";
+    font-family: 'Material Symbols Outlined';
+    position: absolute;
+    left: 14px;
+    font-size: 20px;
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Shortcut Badge */
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) > div::after {
+    content: "⌘K";
+    position: absolute;
+    right: 12px;
+    background: rgba(0, 218, 243, 0.1); 
+    border: 1px solid rgba(0, 218, 243, 0.2);
+    border-radius: 4px; 
+    padding: 2px 6px; 
+    font-size: 10px; 
+    color: var(--primary); 
+    font-family: 'Space Grotesk', monospace;
+    pointer-events: none;
+    z-index: 10;
+}
+
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) input {
+    background: transparent !important;
+    border: none !important;
+    color: white !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.9rem !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 50px 0 45px !important; 
+    outline: none !important;
+}
+
+div[data-testid="stSidebar"] div[data-testid="stTextInput"]:has(input[placeholder="Search region..."]) input::placeholder {
+    color: rgba(255,255,255,0.4) !important;
+    opacity: 1 !important;
 }
