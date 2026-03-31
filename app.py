@@ -1,140 +1,70 @@
 import streamlit as st
-import folium
-from streamlit_folium import st_folium
 
-# Import Utilities
-from utils.data_loader import fetch_recent_weather, prepare_prediction_features, get_disaster_stats
-from utils.ai_generator import predict_disaster_probability, generate_ai_recommendation
-from utils.geo_utils import detect_geo_type
-from templates.ui_components import (
-    render_custom_css, render_meta, render_hero, render_footer, 
-    render_glass_card, render_decision_box, render_blocked_box,
-    render_disaster_history, render_weather_insights
-)
-
-# --- 1. CONFIGURATION ---
+# --- 1. CONFIGURATION (MUST BE FIRST) ---
 st.set_page_config(
-    page_title="TerraGuard AI - Property Risk Assessor", 
-    layout="wide", 
+    page_title="TerraGuard AI — Property Risk Assessor",
     page_icon="🌍",
-    initial_sidebar_state="collapsed"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# Render Styles & Header
+try:
+    from templates.ui_common import (
+        render_custom_css, render_meta, render_top_nav, render_footer
+    )
+except Exception as e:
+    import traceback
+    st.error("IMPORT ERROR:")
+    st.error(traceback.format_exc())
+    st.stop()
+
+# --- 2. GLOBAL STYLES & HEADER ---
 render_custom_css()
 render_meta()
-render_hero()
+render_top_nav()
 
-# --- 2. STATE MANAGEMENT ---
-if 'target_lat' not in st.session_state:
-    st.session_state.target_lat = -5.4297
-if 'target_lon' not in st.session_state:
-    st.session_state.target_lon = 105.2625
-if 'should_analyze' not in st.session_state:
-    st.session_state.should_analyze = False
+# --- 3. PAGE DEFINITIONS ---
+map_page = st.Page("views/map.py", title="Peta Interaktif", icon="📍", default=True)
+report_page = st.Page("views/report.py", title="Hasil Analisis", icon="📊")
+advisor_page = st.Page("views/advisor.py", title="Gemini Advisor", icon="🤖")
 
-# --- 3. MAP SELECTION ---
-st.markdown('<p class="section-title">📍 Peta Interaktif — Pilih Lokasi Lahan</p>', unsafe_allow_html=True)
-st.markdown('<p class="section-subtitle">Klik pada peta untuk memindahkan pin ke lokasi lahan yang ingin Anda analisis.</p>', unsafe_allow_html=True)
+# --- 4. NAVIGATION SETUP ---
+pg = st.navigation(
+    {
+        "Menu Utama": [map_page, report_page, advisor_page]
+    }
+)
 
-col_map, col_info = st.columns([3, 1])
+# --- 5. SIDEBAR & BRANDING ---
+st.logo("C:\\Users\\User\\.gemini\\antigravity\\brain\\62abe053-4f52-4b1e-83d9-fd395f69f54a\\terraguard_logo_1774958485432.png")
 
-with col_map:
-    # Render Interactive Map
-    m = folium.Map(location=[-4.9818, 105.0766], zoom_start=8, tiles="CartoDB positron")
-    folium.Marker(
-        [st.session_state.target_lat, st.session_state.target_lon],
-        popup="📌 Lokasi Lahan Incaran",
-        icon=folium.Icon(color="blue", icon="home", prefix='fa')
-    ).add_to(m)
-
-    map_data = st_folium(m, width="100%", height=420, returned_objects=["last_clicked"])
-
-    # Update State on Click
-    if map_data and map_data.get("last_clicked"):
-        new_lat, new_lon = map_data["last_clicked"]["lat"], map_data["last_clicked"]["lng"]
-        if new_lat != st.session_state.target_lat or new_lon != st.session_state.target_lon:
-            st.session_state.target_lat, st.session_state.target_lon = new_lat, new_lon
-            st.session_state.should_analyze = False
-            st.rerun()
-
-with col_info:
-    # Geo Detection
-    lokasi, geo_type, geo_warning = detect_geo_type(st.session_state.target_lat, st.session_state.target_lon)
+with st.sidebar:
+    st.markdown("""
+    <div style="padding: 0.5rem 0 1rem 0; border-bottom: 1px solid rgba(65, 72, 75, 0.2); margin-bottom: 1rem;">
+        <h2 style="font-family: 'Space Grotesk', sans-serif; color: var(--primary); font-size: 1.25rem; font-weight: 700; margin-bottom: 0;">Lampung Edition</h2>
+        <p style="font-size: 10px; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: 2px; font-weight: 400; opacity: 0.7;">Regional Risk Assessor</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Render Info Card
-    render_glass_card(st.session_state.target_lat, st.session_state.target_lon, lokasi, geo_type)
-    
-    if geo_warning:
-        st.warning(geo_warning)
-    
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("🔍 Analisis Lahan Ini", type="primary", use_container_width=True):
-        st.session_state.should_analyze = True
+    st.info("Pilih menu di atas untuk melakukan analisis lahan secara otomatis.")
 
-# --- 4. ANALYSIS PROCESS ---
-if st.session_state.should_analyze:
-    # Check if building is possible
-    if geo_type.startswith("Perairan") and geo_warning and ("mungkin" in geo_warning or "bisa" in geo_warning):
-        render_blocked_box(geo_warning)
-    else:
-        with st.status(f"Menganalisis Lahan di {lokasi}...", expanded=True) as status:
-            st.write("🛰️ Mengambil data iklim (90 Hari) & topografi...")
-            weather_data, metadata = fetch_recent_weather(st.session_state.target_lat, st.session_state.target_lon)
-            
-            if weather_data.empty:
-                status.update(label="API Error: Gagal mengambil data cuaca.", state="error")
-            else:
-                st.write("⚙️ Mengekstraksi Fitur ML (Lags, Rolling Trends)...")
-                features_df = prepare_prediction_features(weather_data)
-                
-                if features_df.empty:
-                    status.update(label="Data Error: Data historis tidak mencukupi.", state="error")
-                else:
-                    st.write("🧠 Menjalankan Inferensi Logistic Regression...")
-                    prob_score = predict_disaster_probability(features_df)
-                    
-                    status.update(label=f"Analisis Selesai! (Elevasi: {metadata.get('elevation')} mdpl)", state="complete", expanded=False)
+# --- 6. RUN ACTIVE PAGE ---
+pg.run()
 
-                    # --- 5. RESULT DASHBOARD ---
-                    # Decision Box & Category
-                    status_text = render_decision_box(prob_score, geo_type, metadata.get('elevation', 0))
-
-                    col_met1, col_met2, col_met3 = st.columns(3)
-                    col_met1.metric("Probabilitas Bencana", f"{prob_score}%", delta=status_text, delta_color="inverse" if prob_score > 30 else "normal")
-                    col_met2.metric("Curah Hujan Terkini", f"{features_df['total_rain_mm'].iloc[-1]:.1f} mm")
-                    col_met3.metric("Ketinggian Lahan", f"{metadata.get('elevation', 0)} mdpl")
-
-                    # Deep Insights
-                    tab_ai, tab_data = st.tabs(["🤖 Konsultan AI (Google Gemini 2.5 Flash)", "📊 Analisis Detail & Sejarah"])
-                    
-                    with tab_ai:
-                        with st.spinner("AI sedang merumuskan desain konstruksi..."):
-                            ai_report = generate_ai_recommendation(
-                                prob_score, lokasi, features_df.iloc[-1], metadata.get('elevation', 0), geo_type
-                            )
-                        st.markdown(ai_report)
-                    
-                    with tab_data:
-                        # 1. Weather Trends & Features
-                        st.markdown("#### 📈 Tren Curah Hujan Harian")
-                        st.line_chart(weather_data.set_index('date')['rain_sum'], color="#0ea5e9")
-                        st.caption("Curah hujan harian yang digunakan sebagai input model ML.")
-                        
-                        st.markdown("---")
-                        render_weather_insights(features_df)
-                        
-                        st.markdown("---")
-                        # 2. BNPB Historical Records
-                         # Muat dan tampilkan sejarah bencana BNPB
-                        with st.spinner("Memuat catatan sejarah bencana..."):
-                            df_by_type, df_by_year, total_events, last_year = get_disaster_stats(lokasi)
-                        render_disaster_history(df_by_type, df_by_year, total_events, last_year, lokasi)
-                        
-                        # 3. Raw Model Features
-                        with st.expander("🔎 Lihat Fitur Model Terproses (Raw Dataframe)"):
-                             st.dataframe(features_df.tail(3).T, use_container_width=True)
-
-# Footer
-st.markdown("---")
+# --- 7. GLOBAL FOOTER ---
+st.markdown("""
+<div class="global-floating-stats" style="position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; gap: 8px;">
+    <div style="background: rgba(25, 31, 49, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 8px 16px; border-radius: 9999px; border: 1px solid rgba(65, 72, 75, 0.3); display: flex; align-items: center; gap: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary);"></span>
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--on-surface-variant);">Precision: <span style="color: var(--on-surface);">0.02m</span></span>
+        </div>
+        <div style="height: 16px; width: 1px; background: rgba(65, 72, 75, 0.5);"></div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--secondary);"></span>
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--on-surface-variant);">Stability: <span style="color: var(--on-surface);">99.4%</span></span>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 render_footer()

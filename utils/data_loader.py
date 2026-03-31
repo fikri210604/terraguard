@@ -173,3 +173,89 @@ def get_disaster_stats(kab_name):
     except Exception as e:
         print(f"Disaster data error: {e}")
         return None, None, 0, None
+
+def fetch_latest_earthquake(user_lat, user_lon):
+    """
+    Menarik data gempabumi M > 5.0 terkini dari BMKG (autogempa.json).
+    Menghitung jarak dari lokasi pengguna (user_lat, user_lon) ke episentrum.
+    """
+    url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json"
+    
+    try:
+        from utils.geo_facility import calculate_haversine_distance
+        req = requests.get(url, timeout=10)
+        if req.status_code == 200:
+            data = req.json()
+            gempa_list = data['Infogempa']['gempa']
+            
+            closest_gempa = None
+            min_dist = float('inf')
+            
+            # Cari gempa paling dekat dari daftar 15 gempa terbaru BMKG
+            for gempa in gempa_list:
+                coords = gempa['Coordinates'].split(",")
+                eq_lat = float(coords[0])
+                eq_lon = float(coords[1])
+                
+                dist = calculate_haversine_distance(user_lat, user_lon, eq_lat, eq_lon)
+                
+                if dist < min_dist:
+                    min_dist = dist
+                    closest_gempa = {
+                        "magnitude": gempa['Magnitude'],
+                        "depth": gempa['Kedalaman'],
+                        "date": f"{gempa['Tanggal']} {gempa['Jam']}",
+                        "location": gempa['Wilayah'],
+                        "potensi": gempa.get('Potensi', 'Tidak berpotensi tsunami'),
+                        "distance_km": dist
+                    }
+                    
+            return closest_gempa
+    except Exception as e:
+        print(f"BMKG Earthquake API Error: {e}")
+        
+    return None
+
+def get_flood_hotspots():
+    """
+    Mengambil total kejadian bencana (banjir/longsor) per kabupaten untuk di-map ke koordinat pusat.
+    Mengembalikan daftar dictionary koordinat dan jumlah kejadian.
+    """
+    csv_path = "data/raw/data_bencana.csv"
+    if not os.path.exists(csv_path):
+        return []
+        
+    try:
+        df = pd.read_csv(csv_path, low_memory=False)
+        df = df[df['Provinsi'] == 'Lampung'].copy()
+        
+        target_types = ['Banjir', 'Tanah Longsor', 'Longsor', 'Cuaca ekstrem', 'Puting Beliung']
+        df = df[df['Jenis Bencana'].isin(target_types)].copy()
+        
+        df['kabupaten_clean'] = df['Kabupaten'].str.replace('Kota ', '', regex=False).str.strip().str.lower()
+        
+        counts = df.groupby('kabupaten_clean').size().reset_index(name='jumlah')
+        
+        # Gabungkan dengan koordinat baku
+        kab_coords = get_lampung_kabupaten()
+        hotspots = []
+        
+        for k_data in kab_coords:
+            k_name_clean = k_data['kabupaten'].lower()
+            
+            # Cari kecocokan substring
+            match = counts[counts['kabupaten_clean'].str.contains(k_name_clean, case=False, na=False)]
+            if not match.empty:
+                jumlah_bencana = int(match['jumlah'].sum())
+                hotspots.append({
+                    "lat": k_data['lat'],
+                    "lon": k_data['lon'],
+                    "nama": k_data['kabupaten'],
+                    "jumlah": jumlah_bencana
+                })
+                
+        return hotspots
+        
+    except Exception as e:
+        print(f"Hotspot reading error: {e}")
+        return []

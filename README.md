@@ -17,18 +17,19 @@ Proyek ini menonjolkan penggunaan **Google Gemini 2.5 Flash** bukan sekadar seba
 
 ## ✨ Fitur Inovatif
 *   **📍 Precision Pin-Drop**: Navigasi peta interaktif untuk pemilihan titik lahan secara akurat.
-*   **⛰️ Topographic Intelligence**: Analisis otomatis risiko longsor berdasarkan ketinggian lahan (mdpl).
-*   **📊 BNPB Historical Deep-Dive**: Menyajikan data sejarah bencana nyata 15 tahun terakhir di lokasi terpilih.
-*   **⚡ Real-Time Weather Routing**: Mengambil data meteorologi 90 hari terakhir secara dinamis via API.
-*   **🤖 Gemini Expert Tab**: Dedicated space untuk konsultasi hasil analisis dalam format laporan profesional.
+*   **⛰️ High-Res DEMNAS Intelligence**: Analisis kelerengan (*Slope*) menggunakan data satelit DEMNAS (resolusi 8m) untuk deteksi presisi risiko longsor.
+*   **🚨 Adaptive Seismic Warning**: Terkoneksi ke BMKG untuk memantau gempa terbaru (M > 5.0) dan menghitung jarak radius bahaya dari pusat episentrum secara real-time.
+*   **🚫 Smart Geo-Blocking**: Otomatis mendeteksi dan memblokir analisis jika lahan berada di atas infrastruktur terlarang (Jalan Raya, Rel Kereta, Sungai, atau Laut) via Zoom-18 Geocoding.
+*   **📈 Dynamic Weather Trends**: Mengambil data meteorologi 90 hari terakhir secara dinamis via API untuk input model ML.
+*   **🤖 Gemini Expert Advisor**: Konsultasi hasil analisis dalam format laporan arsitektur profesional oleh Google Gemini 2.5 Flash.
 
 ---
 
 ## 🛠️ Teknologi Stack
 *   **AI/ML Core**: Logistic Regression (Predictive) + **Google Gemini 2.5 Flash (Generative)**.
 *   **Framework**: Streamlit (Backend & UI).
-*   **Geospatial**: Folium, Leaflet, & Nominatim API.
-*   **Data Source**: Open-Meteo & BNPB Indonesia.
+*   **Geospatial**: Folium, Rasterio (DEM Processing), & Nominatim Street-Level API.
+*   **Data Source**: Open-Meteo, BMKG (Seismic), & BIG (DEMNAS).
 
 ---
 
@@ -40,8 +41,12 @@ Proyek ini menonjolkan penggunaan **Google Gemini 2.5 Flash** bukan sekadar seba
 │   └── index.html        # HTML Meta & Layout Fragments
 ├── utils/
 │   ├── ai_generator.py   # Core Logic: ML Inference & Gemini Expert
-│   ├── data_loader.py    # Data Pipeline (Weather & BNPB)
-│   └── geo_utils.py      # Geographic Intelligence
+│   ├── data_loader.py    # Data Pipeline (Weather & BMKG)
+│   ├── geo_utils.py      # Geographic Intelligence (Road/River Detection)
+│   ├── dem_loader.py     # Satellite DEMNAS Slope Processor
+│   └── geo_facility.py   # Overpass API (Hospitals/Police/Fire)
+├── data/
+│   └── raw/denmas/       # High-Resolution Satellite Elevation Tiff
 ├── static/
 │   └── style.css         # Premium Glassmorphism Design
 └── scripts/

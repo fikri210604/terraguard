@@ -1,54 +1,45 @@
 ========================================================================
-ALUR KERJA (SCHEME): TERRAGUARD AI - EDISI LAMPUNG
+ALUR KERJA (SCHEME): TERRAGUARD AI - EDISI LAMPUNG (FINAL)
 ========================================================================
 
 ------------------------------------------------------------------------
-TAHAP 1: PERSIAPAN (API & ENVIRONMENT)
+TAHAP 1: PERSIAPAN (API & ENVIRONMENT) - [DONE]
 ------------------------------------------------------------------------
-[x] 1. Buka Terminal di folder proyek.
-[x] 2. Update library: `pip install -r requirement.txt`.
-[x] 3. Dapatkan Gemini API Key di: https://aistudio.google.com/app/apikey.
-[x] 4. Edit file `.env`, masukkan API Key: `GOOGLE_API_KEY=AIza...`
+[x] 1. Update library: `pip install -r requirement.txt` & `pip install rasterio`.
+[x] 2. Setup `.env`: `GOOGLE_API_KEY=AIza...`.
 
 ------------------------------------------------------------------------
-TAHAP 2: PENGUMPULAN DATA (SELESAI)
+TAHAP 2: PENGUMPULAN DATA (MULTI-SOURCE) - [DONE]
 ------------------------------------------------------------------------
-[x] 1. Scrape data bencana BNPB via Superset API → `data/raw/data_bencana.csv`
-       Script: `data/raw/scrapy.py` (~53.000 baris, nasional)
-
-[x] 2. Fetch data cuaca historis 16 tahun (2010-2026) via Open-Meteo Archive API
-       → `data/raw/historical_weather_lampung.csv`
-       Script: `data/raw/historical_weather_fetcher.py` (Full Lampung 15 Kab)
+[x] 1. Weather Data Archive: Open-Meteo (2010-2026) for ML Training.
+[x] 2. Real-Time Data: Open-Meteo Forecast, BMKG Seismic API, & Overpass OSM.
+[x] 3. Satellite Elevation: BIG (DEMNAS) 8m resolution for slope calcs.
 
 ------------------------------------------------------------------------
-TAHAP 3: PREDICTIVE MODEL TRAINING (notebooks/model_bnpb.ipynb) - SELESAI
+TAHAP 3: PREDICTIVE MODEL (LR) - [DONE]
 ------------------------------------------------------------------------
-[x] 1. Agregasi fitur bulanan & target shifting (disaster in next month).
-[x] 2. Feature engineering: Lags, Rolling Means, Month Sin/Cos.
-[x] 3. Temporal train-test split (Train <= 2023, Test >= 2024).
-[x] 4. Model selection: Logistic Regression (Pemenang AUC: 0.624).
-[x] 5. Export pkl: Predictive Risk Model & StandardScaler.
+[x] 1. Train Logistic Regression for flood/landslide risk scoring.
+[x] 2. Export Model & Scaler to `.pkl`.
 
 ------------------------------------------------------------------------
-TAHAP 4: INTEGRASI GPS & KEPUTUSAN PROPERTI (PROSES)
+TAHAP 4: CORE DEVELOPMENT (UI & INTEGRATION) - [DONE]
 ------------------------------------------------------------------------
-[ ] 1. Rewire `utils/data_loader.py` untuk GPS Coordinates:
-       - [ ] Update `fetch_recent_weather()` agar menerima dinamik Lat/Lon dari Peta.
-       - [ ] Logic "Nearest Kabupaten" (Optional) untuk mapping histori BNPB jika diperlukan.
-
-[ ] 2. Web App Logic (`app.py`):
-       - [ ] Hapus Dropdown Kabupaten statis.
-       - [ ] Ganti dengan Peta Interaktif `folium` (Klik / Click untuk Drop Pin).
-       - [ ] Tombol Analisis menggunakan koordinat dari Pin Drop.
-
-[ ] 3. Generative AI Property Consultant (`utils/ai_generator.py`):
-       - [ ] Inject data probabilitas & cuaca ke Prompt Gemini.
-       - [ ] Update Prompt agar memberikan keputusan tegas: "BOLEH DIBELI" vs "JANGAN DIBELI".
+[x] 1. Dynamic Map: Folium with Sesar Semangko PolyLine overlay.
+[x] 2. Safety Safeguard: High-zoom (18) geocoding to block roads/rivers.
+[x] 3. DEM Processor: Python script to calculate slope percentage.
+[x] 4. Adaptive Seismic: Geographically closest earthquake filtering.
+[x] 5. Infrastructure: Detect proximity to Hospitals, Police, and Fire Stations.
 
 ------------------------------------------------------------------------
-TAHAP 5: VERIFIKASI & DEPLOYMENT
+TAHAP 5: GENERATIVE AI EXPERT (GEMINI 2.5) - [DONE]
 ------------------------------------------------------------------------
-[ ] 1. Test Drop Pin di berbagai lokasi ekstrem (pantai vs gunung) di Lampung.
-[ ] 2. Verifikasi Gemini selalu memberikan rekomendasi properti yang relevan.
-[ ] 3. Push ke GitHub + Update `README.md`.
-[ ] 4. Streamlit Cloud Deploy - Monitoring API Usage.
+[x] 1. Reasoner: Gemini interprets ML score + Slope + Seismic + Infrastructure.
+[x] 2. Advisor: Gemini generates technical construction & legal recommendations.
+
+------------------------------------------------------------------------
+TAHAP 6: FINAL CHECK & DEPLOYMENT - [DONE]
+------------------------------------------------------------------------
+[x] 1. Local Verification: Test across various Lampung terrains.
+[x] 2. Metadata Update: Sync README.md and project scheme.
+[x] 3. Push to GitHub (w/ .gitignore for large Tiff files).
+[x] 4. Deploy to Streamlit Cloud.

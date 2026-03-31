@@ -10,21 +10,79 @@
 <!-- META SECTION -->
 
 <!-- HERO SECTION -->
-<div class="hero-container">
-    <div class="hero-badge">🧠 POWERED BY MACHINE LEARNING & GOOGLE GEMINI 2.5 FLASH</div>
-    <h1 class="hero-title">🌍 TerraGuard AI</h1>
-    <p class="hero-subtitle">Property Risk Assessor & Smart Consultant — Edisi Lampung</p>
-    <p class="hero-desc">
-        Ingin membeli tanah atau membangun rumah di Lampung? 
-        <strong>Tandai lokasi lahan di peta</strong>, biarkan Machine Learning memprediksi probabilitas bencana, 
-        dan biarkan <strong>Gemini AI Expert Advisor</strong> memberikan keputusan investasi yang rasional untuk Anda.
-    </p>
-</div>
+<header class="top-nav-bar">
+    <div class="nav-brand">
+        <button id="sidebar-toggle-btn" class="nav-toggle-btn">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+        <span class="brand-text">TerraGuard AI</span>
+    </div>
+    <div class="nav-status">
+        <div class="status-pill">
+            <span class="ping-dot">
+                <span class="ping-animate"></span>
+                <span class="ping-core"></span>
+            </span>
+            <span class="status-text">BMKG Connected</span>
+        </div>
+        <div class="profile-actions">
+            <span class="material-symbols-outlined nav-icon">sensors</span>
+            <span class="material-symbols-outlined nav-icon">push_pin</span>
+            <div class="profile-pic">
+                 <span class="material-symbols-outlined" style="color: #00daf3; font-size: 24px;">account_circle</span>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="top-nav-spacer"></div>
 <!-- HERO SECTION -->
 
 <!-- FOOTER SECTION -->
-<div class="footer-bar">
-    🌍 TerraGuard AI v2.0 — Dikembangkan untuk <strong>IDCamp 2026</strong><br>
-    Menggunakan <a href="#">Streamlit</a> · <a href="#">Folium</a> · <a href="#">Open-Meteo API</a> · <a href="#">Google Gemini</a>
-</div>
+
+<script>
+    // Sidebar Toggle Logic (Improved)
+    document.addEventListener('click', function(e) {
+        const toggleBtn = e.target.closest('#sidebar-toggle-btn');
+        if (toggleBtn) {
+            const doc = window.parent.document;
+            const collapseBtn = doc.querySelector('div[data-testid="stSidebarCollapseButton"] button') || doc.querySelector('button[aria-label="Collapse sidebar"]');
+            const expandBtn = doc.querySelector('button[data-testid="stExpandSidebarButton"]') || doc.querySelector('button[aria-label="Expand sidebar"]');
+            
+            // Priority 1: If expand button is visible, click it
+            if (expandBtn && expandBtn.getBoundingClientRect().width > 0) {
+                expandBtn.click();
+            } 
+            // Priority 2: If collapse button is visible, click it
+            else if (collapseBtn && collapseBtn.getBoundingClientRect().width > 0) {
+                collapseBtn.click();
+            }
+            // Fallback: Just try both if width detection fails
+            else if (expandBtn) {
+                expandBtn.click();
+            } else if (collapseBtn) {
+                collapseBtn.click();
+            }
+        }
+    });
+
+    // Auto-hide Native Streamlit Header on Map Page
+    const observer = new MutationObserver((mutations) => {
+        const doc = window.parent.document;
+        if (doc.querySelector('.map-fullscreen-flag')) {
+            const header = doc.querySelector('header[data-testid="stHeader"]');
+            if (header) header.style.display = 'none';
+        }
+    });
+    observer.observe(window.parent.document.body, { childList: true, subtree: true });
+</script>
+<footer class="footer-bar-new">
+    <div class="footer-text">
+        © 2026 TerraGuard AI. Data: BMKG, Open-Meteo, BIG.
+    </div>
+    <div class="footer-links">
+        <a href="#">Disclaimers</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+    </div>
+</footer>
 <!-- FOOTER SECTION -->
