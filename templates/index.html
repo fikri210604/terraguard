@@ -35,32 +35,34 @@
     </div>
 </header>
 <div class="top-nav-spacer"></div>
-<!-- HERO SECTION -->
-
-<!-- FOOTER SECTION -->
 
 <script>
-    // Sidebar Toggle Logic (Improved)
+    // Sidebar Toggle Logic (Improved & Moved to Header)
+    console.log("TerraGuard Navigation Script Loaded");
+    
     document.addEventListener('click', function(e) {
         const toggleBtn = e.target.closest('#sidebar-toggle-btn');
         if (toggleBtn) {
+            console.log("Toggle Button Clicked");
             const doc = window.parent.document;
-            const collapseBtn = doc.querySelector('div[data-testid="stSidebarCollapseButton"] button') || doc.querySelector('button[aria-label="Collapse sidebar"]');
-            const expandBtn = doc.querySelector('button[data-testid="stExpandSidebarButton"]') || doc.querySelector('button[aria-label="Expand sidebar"]');
             
-            // Priority 1: If expand button is visible, click it
-            if (expandBtn && expandBtn.getBoundingClientRect().width > 0) {
+            // Core selectors for Streamlit sidebar buttons
+            const expandBtn = doc.querySelector('button[data-testid="stExpandSidebarButton"]') || 
+                              doc.querySelector('button[aria-label="Expand sidebar"]');
+            const collapseBtn = doc.querySelector('button[data-testid="stSidebarCollapseButton"]') || 
+                                doc.querySelector('div[data-testid="stSidebarCollapseButton"] button') ||
+                                doc.querySelector('button[aria-label="Collapse sidebar"]');
+            
+            if (expandBtn) {
+                console.log("Opening sidebar...");
                 expandBtn.click();
             } 
-            // Priority 2: If collapse button is visible, click it
-            else if (collapseBtn && collapseBtn.getBoundingClientRect().width > 0) {
+            else if (collapseBtn) {
+                console.log("Closing sidebar...");
                 collapseBtn.click();
             }
-            // Fallback: Just try both if width detection fails
-            else if (expandBtn) {
-                expandBtn.click();
-            } else if (collapseBtn) {
-                collapseBtn.click();
+            else {
+                console.log("No toggle buttons found in DOM.");
             }
         }
     });
@@ -75,6 +77,9 @@
     });
     observer.observe(window.parent.document.body, { childList: true, subtree: true });
 </script>
+<!-- HERO SECTION -->
+
+<!-- FOOTER SECTION -->
 <footer class="footer-bar-new">
     <div class="footer-text">
         © 2026 TerraGuard AI. Data: BMKG, Open-Meteo, BIG.

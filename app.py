@@ -36,7 +36,6 @@ pg = st.navigation(
 )
 
 # --- 5. SIDEBAR & BRANDING ---
-st.logo("C:\\Users\\User\\.gemini\\antigravity\\brain\\62abe053-4f52-4b1e-83d9-fd395f69f54a\\terraguard_logo_1774958485432.png")
 
 with st.sidebar:
     st.markdown("""
